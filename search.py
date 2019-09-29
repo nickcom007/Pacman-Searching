@@ -115,6 +115,60 @@ def depthFirstSearch(problem):
         # Find all successor of current
         # Will return a list of tuples (successor_state, action, stepCost)
         successors = problem.getSuccessors(state)
+        print("all nei:",successors)
+        # check whether still have unvisited neighbour
+        for neighbour in successors:
+                # if haven't visted
+            print(neighbour)
+            if neighbour[0] not in visited:
+                # update state
+                # convert tuple to list
+                temp = list(current)
+                temp[0] = neighbour[0]
+                temp[1] = current[1].copy()
+                temp[1] += [neighbour[1]]
+                temp[2] += 1
+                # convert back to tuple
+                next = tuple(temp)
+                # push back
+                fringe.push(current)
+                fringe.push(next)
+                # set as visted
+                visited.add(neighbour[0])
+                break
+
+
+
+    ##util.raiseNotDefined()
+
+def breadthFirstSearch(problem):
+    """Search the shallowest nodes in the search tree first."""
+    "*** YOUR CODE HERE ***"
+    from game import Directions
+    # Get starting position and initial
+    start_state = problem.getStartState()
+    initial = (start_state,[],0)
+    # Create a fringe and a vistied set
+    fringe = util.Queue()
+    visited = set()
+    # Push the start state with cost to the fringe.
+    fringe.push(initial)
+    visited.add(start_state)
+    # while the fringe is not empty
+    while not fringe.isEmpty():
+        current = fringe.pop()
+        print('current0:',current)
+        state = current[0]
+        route = current[1]
+        # then visted
+        visited.add(state)
+        # If is goal, then return route
+        if problem.isGoalState(state):
+            return route
+        # If not goal
+        # Find all successor of current
+        # Will return a list of tuples (successor_state, action, stepCost)
+        successors = problem.getSuccessors(state)
         # check whether still have unvisited neighbour
         for neighbour in successors:
                 # if haven't visted
@@ -136,12 +190,6 @@ def depthFirstSearch(problem):
                 break
 
 
-
-    #util.raiseNotDefined()
-
-def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
     #util.raiseNotDefined()
 
 def uniformCostSearch(problem):
