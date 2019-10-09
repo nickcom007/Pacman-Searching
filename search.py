@@ -90,11 +90,10 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    from game import Directions
     # Get starting position and initial
     start_state = problem.getStartState()
     initial = (start_state,[],0)
-    # Create a fringe and a vistied set
+    # Create a fringe and a visited set
     fringe = util.Stack()
     visited = set()
     # Push the start state with cost to the fringe.
@@ -103,23 +102,21 @@ def depthFirstSearch(problem):
     # while the fringe is not empty
     while not fringe.isEmpty():
         current = fringe.pop()
-        print('current0:',current)
         state = current[0]
         route = current[1]
-        # then visted
+
+        # If pop out then visited
         visited.add(state)
+
         # If is goal, then return route
         if problem.isGoalState(state):
             return route
-        # If not goal
+
         # Find all successor of current
         # Will return a list of tuples (successor_state, action, stepCost)
         successors = problem.getSuccessors(state)
-        print("all nei:",successors)
-        # check whether still have unvisited neighbour
         for neighbour in successors:
-                # if haven't visted
-            print(neighbour)
+            # if haven't visited
             if neighbour[0] not in visited:
                 # update state
                 # convert tuple to list
@@ -128,14 +125,10 @@ def depthFirstSearch(problem):
                 temp[1] = current[1].copy()
                 temp[1] += [neighbour[1]]
                 temp[2] += 1
-                # convert back to tuple
+                # push all neighbours
                 next = tuple(temp)
-                # push back
-                fringe.push(current)
                 fringe.push(next)
-                # set as visted
-                visited.add(neighbour[0])
-                break
+
 
 
 
@@ -144,20 +137,18 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    from game import Directions
-    # Get starting position and initial
+    # initialize the start state
     start_state = problem.getStartState()
     initial = (start_state,[],0)
-    # Create a fringe and a vistied set
+    # Create a fringe(Queue) and a visited set
     fringe = util.Queue()
     visited = set()
     # Push the start state with cost to the fringe.
     fringe.push(initial)
-    visited.add(start_state)
-    # while the fringe is not empty
+    # while fringe is not empty
     while not fringe.isEmpty():
+        # Current is first element added
         current = fringe.pop()
-        print('current0:',current)
         state = current[0]
         route = current[1]
         # then visted
@@ -165,13 +156,13 @@ def breadthFirstSearch(problem):
         # If is goal, then return route
         if problem.isGoalState(state):
             return route
-        # If not goal
-        # Find all successor of current
+
         # Will return a list of tuples (successor_state, action, stepCost)
         successors = problem.getSuccessors(state)
-        # check whether still have unvisited neighbour
+
         for neighbour in successors:
-                # if haven't visted
+            # if haven't visited
+            # Add all unvisited neighbours to the fringe
             if neighbour[0] not in visited:
                 # update state
                 # convert tuple to list
@@ -183,11 +174,9 @@ def breadthFirstSearch(problem):
                 # convert back to tuple
                 next = tuple(temp)
                 # push back
-                fringe.push(current)
                 fringe.push(next)
-                # set as visted
+                # set as visited
                 visited.add(neighbour[0])
-                break
 
 
     #util.raiseNotDefined()
@@ -195,7 +184,52 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Get starting position and initial
+    start_state = problem.getStartState()
+    initial = (start_state, [], 0)
+    # Create a fringe and a visited set
+    fringe = util.PriorityQueue()
+    visited = set()
+    # Push the start state with cost to the fringe.
+    cost = problem.getCostOfActions(initial[1])
+    fringe.push(initial,priority=cost)
+    # while the fringe is not empty
+    while not fringe.isEmpty():
+        current = fringe.pop()
+        state = current[0]
+        route = current[1]
+
+        # If is goal, then return route
+        if problem.isGoalState(state):
+            return route
+
+        visited.add(state)
+        # Find all successor of current
+        # Will return a list of tuples (successor_state, action, stepCost)
+        successors = problem.getSuccessors(state)
+        for neighbour in successors:
+            # if haven't visited
+            if neighbour[0] not in visited:
+                # update state
+                # convert tuple to list
+                temp = list(current)
+                temp[0] = neighbour[0]
+                temp[1] = current[1].copy()
+                temp[1] += [neighbour[1]]
+                temp[2] += 1
+
+                # push all neighbours into queue
+                next = tuple(temp)
+                cost = problem.getCostOfActions(next[1])
+                fringe.push(next,priority=cost)
+                # If goal, do not set visited
+                if problem.isGoalState(next[0]):
+                    continue
+                # else visited once pushed
+                else:
+                    visited.add(neighbour[0])
+
+    #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -207,7 +241,60 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Get starting position and initial
+    start_state = problem.getStartState()
+    initial = (start_state, [], 0)
+    # Create a fringe and a visited set
+    fringe = util.PriorityQueue()
+    visited = set()
+    # Push the start state with cost to the fringe.
+    cost = problem.getCostOfActions(initial[1])
+    # calculate heuristic value
+    heuristic_value = heuristic(start_state,problem)
+    # combine cost and heuristic value as priority
+    combined_cost = cost + heuristic_value
+    fringe.push(initial, priority=combined_cost)
+    # while the fringe is not empty
+    while not fringe.isEmpty():
+        current = fringe.pop()
+        state = current[0]
+        route = current[1]
+
+        # If is goal, then return route
+        if problem.isGoalState(state):
+            return route
+
+        visited.add(state)
+        # Find all successor of current
+        # Will return a list of tuples (successor_state, action, stepCost)
+        successors = problem.getSuccessors(state)
+        for neighbour in successors:
+            # if haven't visited
+            if neighbour[0] not in visited:
+                # update state
+                # convert tuple to list
+                temp = list(current)
+                temp[0] = neighbour[0]
+                temp[1] = current[1].copy()
+                temp[1] += [neighbour[1]]
+                temp[2] += 1
+
+                # push all neighbours into queue
+                next = tuple(temp)
+                cost = problem.getCostOfActions(next[1])
+                # calculate heuristic value
+                heuristic_value = heuristic(next[0], problem)
+                # combine cost and heuristic value as priority
+                combined_cost = cost + heuristic_value
+                fringe.push(next, priority=combined_cost)
+                # If goal, do not set visited
+                if problem.isGoalState(next[0]):
+                    continue
+                # else visited once pushed
+                else:
+                    visited.add(neighbour[0])
+
+    #util.raiseNotDefined()
 
 
 # Abbreviations
